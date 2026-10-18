@@ -44,7 +44,7 @@ export const FilterTuner: React.FC<FilterTunerProps> = ({ params, onChange }) =>
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {/* Slider 1: Angular Variance */}
         <div className="space-y-3 p-4 bg-slate-950 rounded-xl border border-slate-800/80">
           <div className="flex items-center justify-between text-xs">
@@ -123,6 +123,106 @@ export const FilterTuner: React.FC<FilterTunerProps> = ({ params, onChange }) =>
           </div>
           <p className="text-[11px] text-slate-400 leading-tight">
             Rate of shape distortion per second. Tumbling plastic trash easily exceeds 0.40.
+          </p>
+        </div>
+
+        {/* Slider 4 (v2): Temporal erratic score */}
+        <div className="space-y-3 p-4 bg-slate-950 rounded-xl border border-slate-800/80">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-slate-300">Temporal Speculation</span>
+            <label className="flex items-center gap-1.5 cursor-pointer text-slate-400">
+              <input
+                type="checkbox"
+                checked={params.enableTemporal}
+                onChange={(e) => onChange({ ...params, enableTemporal: e.target.checked })}
+                className="accent-sky-500"
+              />
+              <span>{params.enableTemporal ? 'ON' : 'OFF (v1)'}</span>
+            </label>
+          </div>
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-slate-400">Max Erratic Score</span>
+            <span className="font-mono text-sky-400 font-bold tabular-nums">
+              {params.maxErraticScore.toFixed(2)}
+            </span>
+          </div>
+          <input
+            type="range"
+            min={0.02}
+            max={0.6}
+            step={0.01}
+            value={params.maxErraticScore}
+            disabled={!params.enableTemporal}
+            onChange={(e) => updateParam('maxErraticScore', parseFloat(e.target.value))}
+            className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-sky-500 disabled:opacity-40"
+          />
+          <p className="text-[11px] text-slate-400 leading-tight">
+            Drops tracks whose motion a constant-velocity predictor can't anticipate. Default tuned on
+            simulator data only; re-tune on real footage.
+          </p>
+        </div>
+
+        {/* Card 5 (v2.1): Size gate */}
+        <div className="space-y-3 p-4 bg-slate-950 rounded-xl border border-slate-800/80">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-slate-300">Size Gate</span>
+            <label className="flex items-center gap-1.5 cursor-pointer text-slate-400">
+              <input
+                type="checkbox"
+                checked={params.enableSizeGate}
+                onChange={(e) => onChange({ ...params, enableSizeGate: e.target.checked })}
+                className="accent-violet-500"
+              />
+              <span>{params.enableSizeGate ? 'ON' : 'OFF'}</span>
+            </label>
+          </div>
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-slate-400">Min Size (% of frame)</span>
+            <span className="font-mono text-violet-400 font-bold tabular-nums">{(params.minAreaFrac * 100).toFixed(2)}%</span>
+          </div>
+          <input
+            type="range" min={0} max={0.01} step={0.0005}
+            value={params.minAreaFrac}
+            disabled={!params.enableSizeGate}
+            onChange={(e) => updateParam('minAreaFrac', parseFloat(e.target.value))}
+            className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-violet-500 disabled:opacity-40"
+          />
+          <p className="text-[11px] text-slate-400 leading-tight">
+            Drops boxes too small to matter (bugs, specks). Scene-dependent: a distant person can be
+            smaller than a bug near the lens.
+          </p>
+        </div>
+
+        {/* Card 6 (v2.1): BBox rigidity (experimental, off by default) */}
+        <div className="space-y-3 p-4 bg-slate-950 rounded-xl border border-slate-800/80">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-slate-300">
+              BBox Rigidity <span className="text-amber-400 font-normal">(experimental)</span>
+            </span>
+            <label className="flex items-center gap-1.5 cursor-pointer text-slate-400">
+              <input
+                type="checkbox"
+                checked={params.enableRigidity}
+                onChange={(e) => onChange({ ...params, enableRigidity: e.target.checked })}
+                className="accent-violet-500"
+              />
+              <span>{params.enableRigidity ? 'ON' : 'OFF'}</span>
+            </label>
+          </div>
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-slate-400">Max Geometric Chaos</span>
+            <span className="font-mono text-violet-400 font-bold tabular-nums">{params.maxBBoxChaos.toFixed(2)}</span>
+          </div>
+          <input
+            type="range" min={0.05} max={0.4} step={0.01}
+            value={params.maxBBoxChaos}
+            disabled={!params.enableRigidity}
+            onChange={(e) => updateParam('maxBBoxChaos', parseFloat(e.target.value))}
+            className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-violet-500 disabled:opacity-40"
+          />
+          <p className="text-[11px] text-slate-400 leading-tight">
+            Drops tracks whose box shape keeps changing. Rigid debris passes, and a flailing person can
+            fail it. Off by default until validated on real footage.
           </p>
         </div>
       </div>
